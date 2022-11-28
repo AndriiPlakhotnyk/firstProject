@@ -32,18 +32,18 @@ input:first-child {
 }
 
 button {
-    width: 70px;
+    width: 60px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    border: 1solid gray;
+    border: 1 solid grey;
 }
 
 th {
-    min-width: 100px;
-    border: 1px solid gray;
+    min-width: 120px;
+    border: 1px solid grey;
     text-align: left;
     padding: 5px;
     background-color: rgb(61,121,233);
@@ -54,4 +54,7 @@ th:first-child {
     min-width: 20px;
 }
 
-
+td {
+    border: 1px solid grey;
+    padding: 5px;
+}
