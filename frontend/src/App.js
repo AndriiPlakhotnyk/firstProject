@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
 
+// Use effect
+// Создать в src папку services 3 функции 
+
 const initialValues = {
   userName: '',
   userSurname: '',
@@ -10,7 +13,7 @@ const initialValues = {
 
 function App() {
   const [userData, setUserData] = useState(initialValues);
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // Запрос с БД
   const [editableUserData, setEditableUserData] = useState({
     isEdit: false,
     userIndex: null
