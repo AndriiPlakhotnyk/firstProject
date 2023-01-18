@@ -1,66 +1,76 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { createOwner, deleteOwner, getAllOwners, updateOwner } from './services/owner-service';
 
 // Use effect
 // Создать в src папку services 3 функции 
 
 const initialValues = {
-  userName: '',
-  userSurname: '',
-  userEmail: '',
-  userAge: ''
+  name: '',
+  surname: '',
+  email: '',
+  phone: ''
 }
 
 function App() {
-  const [userData, setUserData] = useState(initialValues);
-  const [users, setUsers] = useState([]); // Запрос с БД
-  const [editableUserData, setEditableUserData] = useState({
+  const [ownerData, setOwnerData] = useState(initialValues);
+  const [owners, setOwners] = useState([]); // Запрос с БД
+  const [editableOwnerData, setEditableOwnerData] = useState({
     isEdit: false,
-    userIndex: null
+    ownerIndex: null
   })
 
-  const handleRemoveClick = (index) => {
-    setUsers(users.filter((user, userIndex) => userIndex !== index));
-  }
+  useEffect(() => {
+    getAllOwners()
+    .then (
+      (res) => setOwners(res.data)
+    )
+  }, [owners]) 
 
-  const isFilledFields = userData.userName && userData.userSurname && userData.userEmail && userData.userAge;
-
-  const handleSubmitUser = (e) => {
-    e.preventDefault();
-
-    if (isFilledFields) {
-      if(editableUserData.isEdit) {
-        const editedData = users;
-        editedData.splice(editableUserData.userIndex, 1, userData)
-
-        setUsers(editedData);
-
-        setEditableUserData({
-          isEdit: false,
-          userIndex: null
-        })
-      } else {
-        setUsers((prevState) => [...prevState,userData]);
-      }
-
-      
-
-      setUserData(initialValues);
+  const handleRemoveClick = async (id) => {
+    const responce = await deleteOwner(id)
+    if(responce.status === 200){
+      setOwners(owners.filter((ownerId) => ownerId !== id))
     }
   }
 
-  const handleCleanClick = () => setUserData(initialValues);
-  
-  const handleEditClick = (data, index) => {
-    setUserData(data);
-    setEditableUserData({
-      isEdit: true,
-      userIndex: index
-    })
+  const isFilledFields = ownerData.name && ownerData.surname && ownerData.email && ownerData.phone;
+
+  const handleSubmitOwner = async (e) => {
+    e.preventDefault();
+
+    if (isFilledFields) {
+      if(editableOwnerData.isEdit) {
+        const editedData = async (data) => {
+          const edition = await updateOwner(ownerData)
+          if (edition.status === 200) {
+            console.log ('SUCCESS')
+          }
+        }
+
+        setOwners(editedData);
+
+        setEditableOwnerData({
+          isEdit: false,
+          ownerIndex: null
+        })
+      } else {
+        const owner = await createOwner(ownerData)
+        setOwners((prevState) => [...prevState, owner]);
+      }
+      setOwnerData(initialValues);
+    }
   }
 
-
-  console.log('users: ', users)
+  const handleCleanClick = () => setOwnerData(initialValues);
+  
+  const handleEditClick = (data, index) => {
+    setOwnerData(data);
+    setEditableOwnerData({
+      isEdit: true,
+      ownerId: index
+    })
+  }
 
   return (
     <div className="wrapper">
@@ -68,27 +78,26 @@ function App() {
         <div className="table-data">
           <table>
             <th>№</th>
-            <th>User Name</th>
-            <th>User Surname</th>
+            <th>Owner's Name</th>
+            <th>Owner's Surname</th>
             <th>email</th>
-            <th>age</th>
+            <th>phone</th>
             <th>Actions</th>
 
             <tbody>
-              {users.map((user, index) => (
-                <tr>
-                  <td>{index + 1}</td>
-                  <td>{user.userName}</td>
-                  <td>{user.userSurname}</td>
-                  <td>{user.userEmail}</td>
-                  <td>{user.userAge}</td>
+              {owners.map((owner) => (
+                <tr key={owner.id}>
+                  <td>{owner.id}</td>
+                  <td>{owner.name}</td>
+                  <td>{owner.surname}</td>
+                  <td>{owner.email}</td>
+                  <td>{owner.phone}</td>
                   <td>
                     <div>
-                      <button className="edit-action" onClick={() => handleEditClick(user, index)}>edit</button>
-                      <button classNAme="remove-action" onClick={() => handleRemoveClick(index)}>remove</button>
+                      <button className="edit-action" onClick={() => handleEditClick(owner, owner.id)}>edit</button>
+                      <button className="remove-action" onClick={() => handleRemoveClick(owner.id)}>remove</button>
                     </div>
-                  </td>
-
+                  </td> 
                 </tr>
               ))}
             </tbody>
@@ -96,35 +105,35 @@ function App() {
         </div>
 
         <div>
-          <form onSubmit={handleSubmitUser} onReset={handleCleanClick}>
-            <input placeholder='Write your name' onChange={(e) => setUserData((prevState) => ({
+          <form onSubmit={handleSubmitOwner} onReset={handleCleanClick}>
+            <input placeholder='Write your name' onChange={(e) => setOwnerData((prevState) => ({
               ...prevState,
-              userName: e.target.value
+              name: e.target.value
             }))}
-            value={userData.userName}
+            value={ownerData.name}
             />
-            <input placeholder='Write your surname' onChange={(e) => setUserData((prevState) => ({
+            <input placeholder='Write your surname' onChange={(e) => setOwnerData((prevState) => ({
               ...prevState,
-              userSurname: e.target.value
+              surname: e.target.value
             }))}
-            value={userData.userSurname}
+            value={ownerData.surname}
             />
-            <input placeholder='Write your email' onChange={(e) => setUserData((prevState) => ({
+            <input placeholder='Write your email' onChange={(e) => setOwnerData((prevState) => ({
               ...prevState,
-              userEmail: e.target.value
+              email: e.target.value
             }))}
-            value={userData.userEmail}
+            value={ownerData.email}
             />
-            <input placeholder='Write your age' onChange={(e) => setUserData((prevState) => ({
+            <input placeholder='Write your phone' onChange={(e) => setOwnerData((prevState) => ({
               ...prevState,
-              userAge: e.target.value
+              phone: e.target.value
             }))}
-            value={userData.userAge}
+            value={ownerData.phone}
             />
 
             <div className="buttons-wrapper">
               <button type = "reset">Clean</button>
-              <button disabled={!isFilledFields} type = "submit">{editableUserData.isEdit ? 'Edit' : 'Add'}</button>
+              <button disabled={!isFilledFields} type = "submit">{editableOwnerData.isEdit ? 'Edit' : 'Add'}</button>
             </div>
           </form>
         </div>
