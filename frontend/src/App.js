@@ -3,7 +3,8 @@ import './App.css';
 import { createOwner, deleteOwner, getAllOwners, updateOwner } from './services/owner-service';
 
 // Use effect
-// Создать в src папку services 3 функции 
+// Use State прочитать
+// ОбЪекты в js, 2.9, 2.13, 2.15, 2.17
 
 const initialValues = {
   name: '',
@@ -41,14 +42,12 @@ function App() {
 
     if (isFilledFields) {
       if(editableOwnerData.isEdit) {
-        const editedData = async (data) => {
-          const edition = await updateOwner(ownerData)
-          if (edition.status === 200) {
-            console.log ('SUCCESS')
-          }
+        
+        const response = await updateOwner(ownerData)
+        if (response.status === 200) {
+          const index = editableOwnerData.ownerIndex
+          setOwners((prevState) => prevState.splice(index, 1, response.data))
         }
-
-        setOwners(editedData);
 
         setEditableOwnerData({
           isEdit: false,
@@ -68,7 +67,7 @@ function App() {
     setOwnerData(data);
     setEditableOwnerData({
       isEdit: true,
-      ownerId: index
+      ownerIndex: index
     })
   }
 
@@ -85,7 +84,7 @@ function App() {
             <th>Actions</th>
 
             <tbody>
-              {owners.map((owner) => (
+              {owners.map((owner, index) => (
                 <tr key={owner.id}>
                   <td>{owner.id}</td>
                   <td>{owner.name}</td>
@@ -94,7 +93,7 @@ function App() {
                   <td>{owner.phone}</td>
                   <td>
                     <div>
-                      <button className="edit-action" onClick={() => handleEditClick(owner, owner.id)}>edit</button>
+                      <button className="edit-action" onClick={() => handleEditClick(owner, index)}>edit</button>
                       <button className="remove-action" onClick={() => handleRemoveClick(owner.id)}>remove</button>
                     </div>
                   </td> 
